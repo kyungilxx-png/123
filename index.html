@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>우리끼리</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#fffbd1;color:#333;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR","Malgun Gothic",sans-serif}
+button,input,textarea{font:inherit}button{cursor:pointer}
+.header{position:sticky;top:0;z-index:10;background:#fffbd1e8;backdrop-filter:blur(10px);padding:18px 15px 12px;text-align:center;border-bottom:1px solid #eee6a0}
+.header h1{margin:0;font-size:28px;letter-spacing:2px}.header p{margin:5px 0 0;color:#777;font-size:12px}
+.container{max-width:720px;margin:auto;padding:16px 12px 40px}
+.notice{background:#fff8c5;border:1px solid #eee4a0;border-radius:14px;padding:11px 13px;margin-bottom:15px;font-size:12px;line-height:1.55;color:#756d2b}
+.big-folder{background:#fff;border:1px solid #eee7b0;border-radius:18px;padding:14px;margin-bottom:16px;box-shadow:0 3px 14px #9992}
+.big-title{font-size:18px;font-weight:800;margin-bottom:10px}.subfolders{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.folder{border:1px solid #eee5a0;background:#fffdf0;border-radius:15px;padding:16px 10px;text-align:left}.folder:active{transform:scale(.98)}
+.folder-icon{font-size:24px;display:block;margin-bottom:6px}.folder-name{font-size:15px;font-weight:800}.folder-count{font-size:11px;color:#999;margin-top:4px}
+.hidden{display:none!important}.back{border:1px solid #e5dd94;background:#fff;border-radius:11px;padding:9px 12px;margin-bottom:12px}
+.path{font-size:13px;color:#777;margin:0 0 13px}.path b{color:#333}
+.upload{width:100%;border:0;border-radius:14px;padding:13px;background:#4f6b32;color:#fff;font-weight:800;margin-bottom:15px}
+.photo-list{display:flex;flex-direction:column;gap:14px}.post{background:#fff;border:1px solid #eee7b0;border-radius:18px;overflow:hidden;box-shadow:0 3px 14px #9992}
+.post img{display:block;width:100%;max-height:560px;object-fit:cover;background:#f3f3f3}.post-body{padding:13px 14px 14px}.desc{font-size:15px;line-height:1.5;white-space:pre-wrap}.date{font-size:11px;color:#999;margin-top:7px}
+.delete{border:0;background:#f1f1f1;color:#777;border-radius:9px;padding:7px 10px;font-size:11px;margin-top:10px}
+.empty{text-align:center;padding:48px 15px;background:#ffffffaa;border:1px dashed #ddd28b;border-radius:18px;color:#999}
+.modal{position:fixed;inset:0;background:#0008;z-index:30;display:flex;align-items:flex-end;justify-content:center}.sheet{width:100%;max-width:720px;background:#fff;border-radius:23px 23px 0 0;padding:18px 15px 27px}
+.sheet h2{margin:0 0 12px;font-size:19px}.preview{width:100%;max-height:300px;object-fit:contain;border-radius:13px;background:#f4f4f4;margin-bottom:11px}
+textarea{width:100%;min-height:88px;border:1px solid #ddd;border-radius:12px;padding:11px;resize:none;outline:none}.actions{display:flex;gap:8px;margin-top:11px}.actions button{flex:1;border:0;border-radius:12px;padding:13px}.cancel{background:#eee}.publish{background:#4f6b32;color:#fff;font-weight:800}
+.status{text-align:center;color:#777;font-size:12px;padding:10px}
+</style>
+</head>
+<body>
+<header class="header"><h1>우리끼리</h1><p>우리 가족 사진첩</p></header>
+<main class="container">
+  <div id="home">
+    <div id="connectionNotice" class="notice">☁️ 저장서버 연결 준비중...</div>
+    <div class="big-folder"><div class="big-title">📁 박씨</div><div class="subfolders">
+      <button class="folder" onclick="openFolder('박채아','park_chae_a')"><span class="folder-icon">📷</span><span class="folder-name">박채아</span><span class="folder-count" id="count-park_chae_a">0장</span></button>
+      <button class="folder" onclick="openFolder('박서아','park_seo_a')"><span class="folder-icon">📷</span><span class="folder-name">박서아</span><span class="folder-count" id="count-park_seo_a">0장</span></button>
+    </div></div>
+    <div class="big-folder"><div class="big-title">📁 김씨</div><div class="subfolders">
+      <button class="folder" onclick="openFolder('김진리','kim_jin_ri')"><span class="folder-icon">📷</span><span class="folder-name">김진리</span><span class="folder-count" id="count-kim_jin_ri">0장</span></button>
+    </div></div>
+    <div class="big-folder"><div class="big-title">📁 모두</div><div class="subfolders">
+      <button class="folder" onclick="openFolder('아무거나','everyone')"><span class="folder-icon">📷</span><span class="folder-name">아무거나</span><span class="folder-count" id="count-everyone">0장</span></button>
+    </div></div>
+  </div>
+
+  <div id="folderPage" class="hidden">
+    <button class="back" onclick="goHome()">← 가족 목록으로</button>
+    <div class="path">우리끼리　›　<b id="folderTitle"></b></div>
+    <button class="upload" onclick="document.getElementById('photoInput').click()">📷 사진 올리기</button>
+    <input id="photoInput" type="file" accept="image/*" class="hidden">
+    <div id="status" class="status"></div>
+    <div id="photoList" class="photo-list"></div>
+  </div>
+</main>
+
+<div id="modal" class="modal hidden"><div class="sheet">
+  <h2>사진 올리기</h2>
+  <img id="preview" class="preview" alt="미리보기">
+  <textarea id="description" placeholder="사진 설명을 간단하게 적어주세요. 예) 채아 생일날 가족사진 ❤️"></textarea>
+  <div class="actions"><button class="cancel" onclick="closeModal()">취소</button><button class="publish" onclick="publishPhoto()">게시하기</button></div>
+</div></div>
+
+<!-- Supabase JS v2 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ==========================================================
+   1) Supabase 프로젝트를 만든 뒤 아래 두 값만 넣으면 됩니다.
+   Project URL: https://xxxx.supabase.co
+   Publishable key: Supabase Dashboard에서 확인
+   절대로 service_role/secret key를 여기에 넣지 마세요.
+   ========================================================== */
+const SUPABASE_URL = "https://qfsjcncqvsxcvxdjbgzx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_ThLq56ySjSJMUkjgbuzknQ_-7PBbBPg";
+const BUCKET = "family-photos";
+
+let db = null;
+let currentFolderName = "";
+let currentFolderKey = "";
+let selectedFile = null;
+
+const folders = ["park_chae_a","park_seo_a","kim_jin_ri","everyone"];
+
+function ready(){
+  return SUPABASE_URL.startsWith("https://") &&
+         !SUPABASE_URL.includes("여기에_") &&
+         !SUPABASE_KEY.includes("여기에_");
+}
+if(ready()){
+  db = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  document.getElementById("connectionNotice").textContent="☁️ 사진은 가족 모두가 함께 보는 저장서버에 보관됩니다.";
+  refreshCounts();
+}else{
+  document.getElementById("connectionNotice").innerHTML="⚙️ 아직 저장서버 설정 전입니다. <b>Supabase 설정 후</b> 가족 사진을 함께 저장할 수 있습니다.";
+}
+
+async function refreshCounts(){
+  if(!db)return;
+  for(const key of folders){
+    const {count,error}=await db.from("family_posts").select("*",{count:"exact",head:true}).eq("folder_key",key);
+    const el=document.getElementById("count-"+key);
+    if(el)el.textContent=(error?"-":(count||0))+"장";
+  }
+}
+function openFolder(name,key){
+  currentFolderName=name; currentFolderKey=key;
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("folderPage").classList.remove("hidden");
+  document.getElementById("folderTitle").textContent=name;
+  if(!db){
+    document.getElementById("photoList").innerHTML='<div class="empty">Supabase 설정이 아직 안 됐어.<br>index.html의 설정값을 넣으면 사진 저장이 시작돼.</div>';
+    return;
+  }
+  loadPhotos();
+}
+function goHome(){
+  document.getElementById("folderPage").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+  refreshCounts();
+}
+document.getElementById("photoInput").addEventListener("change",e=>{
+  const file=e.target.files[0]; if(!file)return;
+  if(!file.type.startsWith("image/")){alert("사진 파일만 올려주세요.");return;}
+  if(file.size>6*1024*1024){alert("사진은 6MB 이하로 올려주세요.");return;}
+  selectedFile=file;
+  const reader=new FileReader();
+  reader.onload=ev=>{document.getElementById("preview").src=ev.target.result;document.getElementById("description").value="";document.getElementById("modal").classList.remove("hidden");};
+  reader.readAsDataURL(file); e.target.value="";
+});
+function closeModal(){selectedFile=null;document.getElementById("modal").classList.add("hidden");}
+async function publishPhoto(){
+  if(!db||!selectedFile)return;
+  const desc=document.getElementById("description").value.trim()||"설명 없음";
+  const ext=(selectedFile.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
+  const path=currentFolderKey+"/"+crypto.randomUUID()+"."+ext;
+  setStatus("사진 업로드 중...");
+  const {error:upErr}=await db.storage.from(BUCKET).upload(path,selectedFile,{contentType:selectedFile.type,cacheControl:"31536000",upsert:false});
+  if(upErr){setStatus("");alert("사진 업로드 실패: "+upErr.message);return;}
+  const {data:urlData}=db.storage.from(BUCKET).getPublicUrl(path);
+  const {error:dbErr}=await db.from("family_posts").insert({folder_key:currentFolderKey,description:desc,storage_path:path,image_url:urlData.publicUrl});
+  if(dbErr){
+    await db.storage.from(BUCKET).remove([path]);
+    setStatus("");alert("게시글 저장 실패: "+dbErr.message);return;
+  }
+  closeModal();setStatus("");await loadPhotos();await refreshCounts();
+}
+async function loadPhotos(){
+  const list=document.getElementById("photoList"); list.innerHTML='<div class="status">사진 불러오는 중...</div>';
+  const {data,error}=await db.from("family_posts").select("*").eq("folder_key",currentFolderKey).order("created_at",{ascending:false});
+  if(error){list.innerHTML='<div class="empty">사진을 불러오지 못했어.<br>'+escapeHtml(error.message)+'</div>';return;}
+  if(!data.length){list.innerHTML='<div class="empty">아직 사진이 없어.<br>첫 번째 사진을 올려봐 📷</div>';return;}
+  list.innerHTML=data.map(p=>`
+    <article class="post">
+      <img src="${escapeAttr(p.image_url)}" alt="가족 사진" loading="lazy">
+      <div class="post-body">
+        <div class="desc">${escapeHtml(p.description||"")}</div>
+        <div class="date">${formatDate(p.created_at)}</div>
+        <button class="delete" onclick="deletePhoto('${escapeAttr(p.id)}','${escapeAttr(p.storage_path)}')">이 사진 삭제</button>
+      </div>
+    </article>`).join("");
+}
+async function deletePhoto(id,path){
+  if(!confirm("이 사진을 삭제할까?"))return;
+  setStatus("삭제 중...");
+  const {error:storageErr}=await db.storage.from(BUCKET).remove([path]);
+  if(storageErr){setStatus("");alert("사진 파일 삭제 실패: "+storageErr.message);return;}
+  const {error:dbErr}=await db.from("family_posts").delete().eq("id",id);
+  if(dbErr){setStatus("");alert("게시글 삭제 실패: "+dbErr.message);return;}
+  setStatus("");await loadPhotos();await refreshCounts();
+}
+function setStatus(t){document.getElementById("status").textContent=t||"";}
+function formatDate(v){return new Date(v).toLocaleString("ko-KR");}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function escapeAttr(s){return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#039;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+</script>
+</body>
+</html>
