@@ -14,6 +14,14 @@ button,input,textarea{font:inherit}button{cursor:pointer}
 .container{max-width:720px;margin:auto;padding:16px 12px 40px}
 .notice{background:#fff8c5;border:1px solid #eee4a0;border-radius:14px;padding:11px 13px;margin-bottom:15px;font-size:12px;line-height:1.55;color:#756d2b}
 .big-folder{background:#fff;border:1px solid #eee7b0;border-radius:18px;padding:14px;margin-bottom:16px;box-shadow:0 3px 14px #9992}
+.ranking-box{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.ranking-card{background:rgba(255,255,255,.94);border:4px solid #d8bd72;border-radius:16px;padding:7px;box-shadow:0 4px 15px rgba(70,50,20,.28);overflow:hidden}
+.ranking-title{text-align:center;font-family:"Jua","Noto Sans KR",sans-serif;font-size:15px;color:#5b431b;margin:2px 0 7px;font-weight:400}
+.ranking-photo-wrap{background:#f7f1d8;border-radius:10px;overflow:hidden;position:relative}
+.ranking-photo{display:block;width:100%;height:125px;object-fit:cover;cursor:pointer}
+.ranking-info{text-align:center;font-size:10px;color:#777;padding:5px 2px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ranking-empty{height:125px;display:flex;align-items:center;justify-content:center;text-align:center;color:#aaa;font-size:11px}
+@media(max-width:380px){.ranking-card{padding:6px}.ranking-photo{height:105px}.ranking-title{font-size:14px}}
 .big-title{font-size:18px;font-weight:800;margin-bottom:10px}.subfolders{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
 .folder{border:1px solid #eee5a0;background:#fffdf0;border-radius:15px;padding:16px 10px;text-align:left}.folder:active{transform:scale(.98)}
 .folder-icon{font-size:24px;display:block;margin-bottom:6px}.folder-name{font-size:15px;font-weight:800}.folder-count{font-size:11px;color:#999;margin-top:4px}
@@ -24,9 +32,23 @@ button,input,textarea{font:inherit}button{cursor:pointer}
 .post img{display:block;width:100%;height:150px;object-fit:cover;background:#f3f3f3;cursor:pointer}.post-body{padding:12px 13px 13px}.desc{font-size:15px;line-height:1.5;white-space:pre-wrap}.meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:7px}.date{font-size:11px;color:#999}.uploader{font-size:11px;color:#666;font-weight:700}.stats{display:flex;align-items:center;gap:10px;margin-top:9px}.stat{font-size:11px;color:#888}.like{border:1px solid #e5e5e5;background:#fff;border-radius:999px;padding:6px 10px;font-size:12px;color:#666}.like.active{background:#fff3c4;border-color:#f0d36a;color:#8a6800;font-weight:800}.like:active{transform:scale(.97)}
 .delete{border:0;background:#f1f1f1;color:#777;border-radius:9px;padding:7px 10px;font-size:11px;margin-top:10px}
 .empty{text-align:center;padding:48px 15px;background:#ffffffaa;border:1px dashed #ddd28b;border-radius:18px;color:#999}
-.lightbox{position:fixed;inset:0;background:#000e;z-index:100;display:flex;align-items:center;justify-content:center;padding:12px}
-.lightbox img{max-width:100%;max-height:92vh;width:auto;height:auto;object-fit:contain;border-radius:8px}
-.lightbox-close{position:absolute;top:12px;right:14px;width:42px;height:42px;border:0;border-radius:50%;background:#ffffffdd;color:#333;font-size:25px;line-height:42px}
+.lightbox{position:fixed;inset:0;background:#000e;z-index:100;display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto}
+.lightbox-panel{position:relative;width:min(720px,100%);max-height:96vh;overflow:auto;background:#111;border-radius:14px;padding:10px}
+.lightbox img{display:block;max-width:100%;max-height:62vh;width:auto;height:auto;object-fit:contain;border-radius:8px;margin:0 auto}
+.review-box{background:#fff;border-radius:13px;margin-top:10px;padding:12px}
+.review-title{font-weight:800;font-size:15px;margin-bottom:9px}
+.review-list{display:flex;flex-direction:column;gap:7px;max-height:180px;overflow:auto}
+.review-item{background:#f8f8f8;border-radius:10px;padding:8px 10px}
+.review-head{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#777;margin-bottom:3px}
+.review-writer{font-weight:800;color:#444}
+.review-text{font-size:13px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.review-empty{text-align:center;color:#aaa;font-size:12px;padding:12px}
+.review-form{margin-top:9px;border-top:1px solid #eee;padding-top:9px}
+.review-form input,.review-form textarea{width:100%;border:1px solid #ddd;border-radius:10px;padding:9px;outline:none;font-size:13px}
+.review-form textarea{min-height:58px;margin-top:6px;resize:none}
+.review-form button{width:100%;border:0;border-radius:10px;padding:10px;margin-top:6px;background:#4f6b32;color:#fff;font-weight:800}
+.lightbox-close{position:absolute;top:12px;right:14px;width:42px;height:42px;border:0;border-radius:50%;background:#ffffffdd;color:#333;font-size:25px;line-height:42px;z-index:2}
+@media(max-width:600px){.lightbox{padding:7px}.lightbox-panel{max-height:97vh;padding:8px}.lightbox img{max-height:55vh}.review-list{max-height:150px}}
 .modal{position:fixed;inset:0;background:#0008;z-index:30;display:flex;align-items:flex-end;justify-content:center}.sheet{width:100%;max-width:720px;background:#fff;border-radius:23px 23px 0 0;padding:18px 15px 27px}
 .sheet h2{margin:0 0 12px;font-size:19px}.preview{width:100%;max-height:300px;object-fit:contain;border-radius:13px;background:#f4f4f4;margin-bottom:11px}
 textarea{width:100%;min-height:88px;border:1px solid #ddd;border-radius:12px;padding:11px;resize:none;outline:none}.uploader-input{width:100%;border:1px solid #ddd;border-radius:12px;padding:11px;outline:none;margin-bottom:9px}.actions{display:flex;gap:8px;margin-top:11px}.actions button{flex:1;border:0;border-radius:12px;padding:13px}.cancel{background:#eee}.publish{background:#4f6b32;color:#fff;font-weight:800}
@@ -37,6 +59,16 @@ textarea{width:100%;min-height:88px;border:1px solid #ddd;border-radius:12px;pad
 <header class="header"><h1>우리끼리 사진첩</h1><p>우리 가족 사진첩</p></header>
 <main class="container">
   <div id="home">
+    <div id="rankingBox" class="ranking-box">
+      <div class="ranking-card">
+        <div class="ranking-title">🏆 추천 1위 사진</div>
+        <div id="likeRanking"></div>
+      </div>
+      <div class="ranking-card">
+        <div class="ranking-title">👑 조회수 1위 사진</div>
+        <div id="viewRanking"></div>
+      </div>
+    </div>
     <div id="connectionNotice" class="notice">☁️ 저장서버 연결 준비중...</div>
     <div class="big-folder"><div class="big-title">📁 박씨</div><div class="subfolders">
       <button class="folder" onclick="openFolder('박채아','park_chae_a')"><span class="folder-icon">📷</span><span class="folder-name">박채아</span><span class="folder-count" id="count-park_chae_a">0장</span></button>
@@ -67,8 +99,19 @@ textarea{width:100%;min-height:88px;border:1px solid #ddd;border-radius:12px;pad
 </main>
 
 <div id="lightbox" class="lightbox hidden" onclick="closeLightbox(event)">
-  <button class="lightbox-close" onclick="closeLightbox()">×</button>
-  <img id="lightboxImage" src="" alt="확대된 가족 사진">
+  <div class="lightbox-panel" onclick="event.stopPropagation()">
+    <button class="lightbox-close" onclick="closeLightbox()">×</button>
+    <img id="lightboxImage" src="" alt="확대된 가족 사진">
+    <div class="review-box">
+      <div class="review-title">💬 이 사진에 한마디</div>
+      <div id="reviewList" class="review-list"><div class="review-empty">리뷰를 불러오는 중...</div></div>
+      <div class="review-form">
+        <input id="reviewWriter" maxlength="20" placeholder="이름">
+        <textarea id="reviewContent" maxlength="300" placeholder="사진에 대한 한마디를 남겨줘 😊"></textarea>
+        <button onclick="submitReview()">리뷰 등록</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="modal" class="modal hidden"><div class="sheet">
@@ -104,6 +147,7 @@ let db = null;
 let currentFolderName = "";
 let currentFolderKey = "";
 let selectedFile = null;
+let currentReviewPostId = null;
 
 const folders = ["park_chae_a","park_seo_a","park_family","park_siru","kim_jin_ri","kim_family","everyone","everyone_fun","everyone_food","everyone_travel"];
 
@@ -116,6 +160,7 @@ if(ready()){
   db = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
   document.getElementById("connectionNotice").textContent="☁️ 사진은 가족 모두가 함께 보는 저장서버에 보관됩니다.";
   refreshCounts();
+  loadRankings();
 }else{
   document.getElementById("connectionNotice").innerHTML="⚙️ 아직 저장서버 설정 전입니다. <b>Supabase 설정 후</b> 가족 사진을 함께 저장할 수 있습니다.";
 }
@@ -127,6 +172,29 @@ async function refreshCounts(){
     const el=document.getElementById("count-"+key);
     if(el)el.textContent=(error?"-":(count||0))+"장";
   }
+}
+
+async function loadRankings(){
+  const likeEl=document.getElementById("likeRanking");
+  const viewEl=document.getElementById("viewRanking");
+  if(!likeEl || !viewEl) return;
+  if(!db){
+    likeEl.innerHTML='<div class="ranking-empty">저장서버 연결 후<br>사진이 표시돼.</div>';
+    viewEl.innerHTML='<div class="ranking-empty">저장서버 연결 후<br>사진이 표시돼.</div>';
+    return;
+  }
+  const [likeResult, viewResult] = await Promise.all([
+    db.from("family_posts").select("id,image_url,description,uploader_name,like_count,view_count").order("like_count",{ascending:false}).order("created_at",{ascending:false}).limit(1),
+    db.from("family_posts").select("id,image_url,description,uploader_name,like_count,view_count").order("view_count",{ascending:false}).order("created_at",{ascending:false}).limit(1)
+  ]);
+  renderRanking(likeEl, likeResult.data && likeResult.data[0], "추천");
+  renderRanking(viewEl, viewResult.data && viewResult.data[0], "조회");
+}
+
+function renderRanking(el,p,type){
+  if(!p){ el.innerHTML='<div class="ranking-empty">아직 사진이 없어 📷</div>'; return; }
+  const count=type==="추천" ? Number(p.like_count||0) : Number(p.view_count||0);
+  el.innerHTML=`<div class="ranking-photo-wrap"><img class="ranking-photo" src="${escapeAttr(p.image_url)}" alt="${type} 1위 사진" onclick="viewPhoto('${escapeAttr(p.id)}',this.src)"><div class="ranking-info">${escapeHtml(p.uploader_name||"이름 없음")} · ${type} ${count}</div></div>`;
 }
 let inFolder=false;
 
@@ -191,7 +259,7 @@ async function publishPhoto(){
     await db.storage.from(BUCKET).remove([path]);
     setStatus("");alert("게시글 저장 실패: "+dbErr.message);return;
   }
-  closeModal();setStatus("");await loadPhotos();await refreshCounts();
+  closeModal();setStatus("");await loadPhotos();await refreshCounts();await loadRankings();
 }
 async function loadPhotos(){
   const list=document.getElementById("photoList"); list.innerHTML='<div class="status">사진 불러오는 중...</div>';
@@ -247,7 +315,7 @@ async function viewPhoto(id,src){
       await db.from("family_posts").update({view_count:next}).eq("id",id);
     }
   }
-  openLightbox(src);
+  openLightbox(src,id);
 }
 
 async function deletePhoto(id,path){
@@ -257,17 +325,66 @@ async function deletePhoto(id,path){
   if(storageErr){setStatus("");alert("사진 파일 삭제 실패: "+storageErr.message);return;}
   const {error:dbErr}=await db.from("family_posts").delete().eq("id",id);
   if(dbErr){setStatus("");alert("게시글 삭제 실패: "+dbErr.message);return;}
-  setStatus("");await loadPhotos();await refreshCounts();
+  setStatus("");await loadPhotos();await refreshCounts();await loadRankings();
 }
-function openLightbox(src){
+async function openLightbox(src,postId){
+  currentReviewPostId = postId || null;
   document.getElementById("lightboxImage").src=src;
+  document.getElementById("reviewWriter").value=localStorage.getItem("family_review_name")||localStorage.getItem("family_uploader_name")||"";
+  document.getElementById("reviewContent").value="";
   document.getElementById("lightbox").classList.remove("hidden");
   document.body.style.overflow="hidden";
+  if(currentReviewPostId) await loadReviews(currentReviewPostId);
 }
+async function loadReviews(postId){
+  const list=document.getElementById("reviewList");
+  if(!db){list.innerHTML='<div class="review-empty">저장서버에 연결되지 않았어.</div>';return;}
+  list.innerHTML='<div class="review-empty">리뷰 불러오는 중...</div>';
+  const {data,error}=await db.from("family_reviews")
+    .select("id,writer_name,content,created_at")
+    .eq("post_id",postId)
+    .order("created_at",{ascending:false});
+  if(error){
+    list.innerHTML='<div class="review-empty">리뷰를 불러오지 못했어.<br>'+escapeHtml(error.message)+'</div>';
+    return;
+  }
+  if(!data || !data.length){
+    list.innerHTML='<div class="review-empty">아직 리뷰가 없어. 첫마디를 남겨봐 😊</div>';
+    return;
+  }
+  list.innerHTML=data.map(r=>`<div class="review-item">
+    <div class="review-head"><span class="review-writer">👤 ${escapeHtml(r.writer_name||"이름 없음")}</span><span>${formatDate(r.created_at)}</span></div>
+    <div class="review-text">${escapeHtml(r.content||"")}</div>
+  </div>`).join("");
+}
+
+async function submitReview(){
+  if(!db || !currentReviewPostId) return;
+  const writer=(document.getElementById("reviewWriter").value.trim()||"이름 없음").slice(0,20);
+  const content=document.getElementById("reviewContent").value.trim();
+  if(!content){alert("리뷰 내용을 입력해줘.");return;}
+  if(content.length>300){alert("리뷰는 300자까지 입력할 수 있어.");return;}
+  const btn=document.querySelector(".review-form button");
+  btn.disabled=true;
+  btn.textContent="등록 중...";
+  const {error}=await db.from("family_reviews").insert({
+    post_id:currentReviewPostId,
+    writer_name:writer,
+    content:content
+  });
+  btn.disabled=false;
+  btn.textContent="리뷰 등록";
+  if(error){alert("리뷰 등록 실패: "+error.message);return;}
+  localStorage.setItem("family_review_name",writer);
+  document.getElementById("reviewContent").value="";
+  await loadReviews(currentReviewPostId);
+}
+
 function closeLightbox(e){
   if(e && e.target && e.target.id!=="lightbox" && !e.target.classList.contains("lightbox-close")) return;
   document.getElementById("lightbox").classList.add("hidden");
   document.getElementById("lightboxImage").src="";
+  currentReviewPostId=null;
   document.body.style.overflow="";
 }
 document.addEventListener("keydown",e=>{
