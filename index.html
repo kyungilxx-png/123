@@ -20,7 +20,7 @@ button,input,textarea{font:inherit}button{cursor:pointer}
 .path{font-size:13px;color:#777;margin:0 0 13px}.path b{color:#333}
 .upload{width:100%;border:0;border-radius:14px;padding:13px;background:#4f6b32;color:#fff;font-weight:800;margin-bottom:15px}
 .photo-list{display:flex;flex-direction:column;gap:14px}.post{background:#fff;border:1px solid #eee7b0;border-radius:18px;overflow:hidden;box-shadow:0 3px 14px #9992}
-.post img{display:block;width:100%;height:220px;object-fit:cover;background:#f3f3f3;cursor:pointer}.post-body{padding:13px 14px 14px}.desc{font-size:15px;line-height:1.5;white-space:pre-wrap}.date{font-size:11px;color:#999;margin-top:7px}
+.post img{display:block;width:100%;height:150px;object-fit:cover;background:#f3f3f3;cursor:pointer}.post-body{padding:12px 13px 13px}.desc{font-size:15px;line-height:1.5;white-space:pre-wrap}.meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:7px}.date{font-size:11px;color:#999}.uploader{font-size:11px;color:#666;font-weight:700}.stats{display:flex;align-items:center;gap:10px;margin-top:9px}.stat{font-size:11px;color:#888}.like{border:1px solid #e5e5e5;background:#fff;border-radius:999px;padding:6px 10px;font-size:12px;color:#666}.like.active{background:#fff3c4;border-color:#f0d36a;color:#8a6800;font-weight:800}.like:active{transform:scale(.97)}
 .delete{border:0;background:#f1f1f1;color:#777;border-radius:9px;padding:7px 10px;font-size:11px;margin-top:10px}
 .empty{text-align:center;padding:48px 15px;background:#ffffffaa;border:1px dashed #ddd28b;border-radius:18px;color:#999}
 .lightbox{position:fixed;inset:0;background:#000e;z-index:100;display:flex;align-items:center;justify-content:center;padding:12px}
@@ -28,7 +28,7 @@ button,input,textarea{font:inherit}button{cursor:pointer}
 .lightbox-close{position:absolute;top:12px;right:14px;width:42px;height:42px;border:0;border-radius:50%;background:#ffffffdd;color:#333;font-size:25px;line-height:42px}
 .modal{position:fixed;inset:0;background:#0008;z-index:30;display:flex;align-items:flex-end;justify-content:center}.sheet{width:100%;max-width:720px;background:#fff;border-radius:23px 23px 0 0;padding:18px 15px 27px}
 .sheet h2{margin:0 0 12px;font-size:19px}.preview{width:100%;max-height:300px;object-fit:contain;border-radius:13px;background:#f4f4f4;margin-bottom:11px}
-textarea{width:100%;min-height:88px;border:1px solid #ddd;border-radius:12px;padding:11px;resize:none;outline:none}.actions{display:flex;gap:8px;margin-top:11px}.actions button{flex:1;border:0;border-radius:12px;padding:13px}.cancel{background:#eee}.publish{background:#4f6b32;color:#fff;font-weight:800}
+textarea{width:100%;min-height:88px;border:1px solid #ddd;border-radius:12px;padding:11px;resize:none;outline:none}.uploader-input{width:100%;border:1px solid #ddd;border-radius:12px;padding:11px;outline:none;margin-bottom:9px}.actions{display:flex;gap:8px;margin-top:11px}.actions button{flex:1;border:0;border-radius:12px;padding:13px}.cancel{background:#eee}.publish{background:#4f6b32;color:#fff;font-weight:800}
 .status{text-align:center;color:#777;font-size:12px;padding:10px}
 </style>
 </head>
@@ -67,6 +67,7 @@ textarea{width:100%;min-height:88px;border:1px solid #ddd;border-radius:12px;pad
 <div id="modal" class="modal hidden"><div class="sheet">
   <h2>사진 올리기</h2>
   <img id="preview" class="preview" alt="미리보기">
+  <input id="uploaderName" class="uploader-input" maxlength="20" placeholder="올린 사람 이름 (예: 경일)">
   <textarea id="description" placeholder="사진 설명을 간단하게 적어주세요. 예) 채아 생일날 가족사진 ❤️"></textarea>
   <div class="actions"><button class="cancel" onclick="closeModal()">취소</button><button class="publish" onclick="publishPhoto()">게시하기</button></div>
 </div></div>
@@ -83,6 +84,14 @@ textarea{width:100%;min-height:88px;border:1px solid #ddd;border-radius:12px;pad
 const SUPABASE_URL = "https://qfsjcncqvsxcvxdjbgzx.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ThLq56ySjSJMUkjgbuzknQ_-7PBbBPg";
 const BUCKET = "family-photos";
+
+/*
+  [추가된 family_posts 컬럼]
+  uploader_name text default '이름 없음'
+  view_count integer default 0
+  like_count integer default 0
+  기존 테이블에 위 3개 컬럼을 추가해야 합니다.
+*/
 
 let db = null;
 let currentFolderName = "";
@@ -154,20 +163,23 @@ document.getElementById("photoInput").addEventListener("change",e=>{
   if(file.size>6*1024*1024){alert("사진은 6MB 이하로 올려주세요.");return;}
   selectedFile=file;
   const reader=new FileReader();
-  reader.onload=ev=>{document.getElementById("preview").src=ev.target.result;document.getElementById("description").value="";document.getElementById("modal").classList.remove("hidden");};
+  reader.onload=ev=>{document.getElementById("preview").src=ev.target.result;document.getElementById("description").value="";document.getElementById("uploaderName").value=localStorage.getItem("family_uploader_name")||"";document.getElementById("modal").classList.remove("hidden");};
   reader.readAsDataURL(file); e.target.value="";
 });
-function closeModal(){selectedFile=null;document.getElementById("modal").classList.add("hidden");}
+function closeModal(){selectedFile=null;document.getElementById("uploaderName").value="";document.getElementById("modal").classList.add("hidden");}
 async function publishPhoto(){
   if(!db||!selectedFile)return;
-  const desc=document.getElementById("description").value.trim()||"설명 없음";
+  const uploader=document.getElementById("uploaderName").value.trim()||"이름 없음";
+   if(uploader!=="이름 없음") localStorage.setItem("family_uploader_name",uploader);
+   if(uploader!=="이름 없음") localStorage.setItem("family_uploader_name",uploader);
+   const desc=document.getElementById("description").value.trim()||"설명 없음";
   const ext=(selectedFile.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
   const path=currentFolderKey+"/"+crypto.randomUUID()+"."+ext;
   setStatus("사진 업로드 중...");
   const {error:upErr}=await db.storage.from(BUCKET).upload(path,selectedFile,{contentType:selectedFile.type,cacheControl:"31536000",upsert:false});
   if(upErr){setStatus("");alert("사진 업로드 실패: "+upErr.message);return;}
   const {data:urlData}=db.storage.from(BUCKET).getPublicUrl(path);
-  const {error:dbErr}=await db.from("family_posts").insert({folder_key:currentFolderKey,description:desc,storage_path:path,image_url:urlData.publicUrl});
+  const {error:dbErr}=await db.from("family_posts").insert({folder_key:currentFolderKey,description:desc,storage_path:path,image_url:urlData.publicUrl,uploader_name:uploader,view_count:0,like_count:0});
   if(dbErr){
     await db.storage.from(BUCKET).remove([path]);
     setStatus("");alert("게시글 저장 실패: "+dbErr.message);return;
@@ -181,14 +193,56 @@ async function loadPhotos(){
   if(!data.length){list.innerHTML='<div class="empty">아직 사진이 없어.<br>첫 번째 사진을 올려봐 📷</div>';return;}
   list.innerHTML=data.map(p=>`
     <article class="post">
-      <img src="${escapeAttr(p.image_url)}" alt="가족 사진" loading="lazy" onclick="openLightbox(this.src)">
+      <img src="${escapeAttr(p.image_url)}" alt="가족 사진" loading="lazy" onclick="viewPhoto('${escapeAttr(p.id)}',this.src)">
       <div class="post-body">
         <div class="desc">${escapeHtml(p.description||"")}</div>
-        <div class="date">${formatDate(p.created_at)}</div>
+        <div class="meta">
+          <div class="uploader">👤 ${escapeHtml(p.uploader_name||"이름 없음")}</div>
+          <div class="date">${formatDate(p.created_at)}</div>
+        </div>
+        <div class="stats">
+          <button class="like ${isLiked(p.id)?"active":""}" onclick="likePhoto('${escapeAttr(p.id)}',this)">👍 추천 <span>${Number(p.like_count||0)}</span></button>
+          <span class="stat">👁 조회 ${Number(p.view_count||0)}</span>
+        </div>
         <button class="delete" onclick="deletePhoto('${escapeAttr(p.id)}','${escapeAttr(p.storage_path)}')">이 사진 삭제</button>
       </div>
     </article>`).join("");
 }
+function isLiked(id){
+  try{return JSON.parse(localStorage.getItem("family_likes")||"[]").includes(String(id));}
+  catch(e){return false;}
+}
+
+function setLiked(id){
+  let arr=[];
+  try{arr=JSON.parse(localStorage.getItem("family_likes")||"[]");}catch(e){}
+  id=String(id);
+  if(!arr.includes(id)){arr.push(id);localStorage.setItem("family_likes",JSON.stringify(arr));}
+}
+
+async function likePhoto(id,btn){
+  if(!db || isLiked(id)) return;
+  const {data,error}=await db.from("family_posts").select("like_count").eq("id",id).single();
+  if(error){alert("추천 처리 실패: "+error.message);return;}
+  const next=Number(data.like_count||0)+1;
+  const {error:updateErr}=await db.from("family_posts").update({like_count:next}).eq("id",id);
+  if(updateErr){alert("추천 처리 실패: "+updateErr.message);return;}
+  setLiked(id);
+  btn.classList.add("active");
+  btn.querySelector("span").textContent=next;
+}
+
+async function viewPhoto(id,src){
+  if(db){
+    const {data,error}=await db.from("family_posts").select("view_count").eq("id",id).single();
+    if(!error){
+      const next=Number(data.view_count||0)+1;
+      await db.from("family_posts").update({view_count:next}).eq("id",id);
+    }
+  }
+  openLightbox(src);
+}
+
 async function deletePhoto(id,path){
   if(!confirm("이 사진을 삭제할까?"))return;
   setStatus("삭제 중...");
