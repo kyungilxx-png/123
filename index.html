@@ -266,6 +266,19 @@ async function loadPhotos(){
   const {data,error}=await db.from("family_posts").select("*").eq("folder_key",currentFolderKey).order("created_at",{ascending:false});
   if(error){list.innerHTML='<div class="empty">사진을 불러오지 못했어.<br>'+escapeHtml(error.message)+'</div>';return;}
   if(!data.length){list.innerHTML='<div class="empty">아직 사진이 없어.<br>첫 번째 사진을 올려봐 📷</div>';return;}
+
+  // 사진별 댓글(리뷰) 개수를 한 번에 가져오기
+  const postIds=data.map(p=>p.id);
+  let reviewCounts={};
+  const {data:reviewRows,error:reviewCountError}=await db.from("family_reviews")
+    .select("post_id")
+    .in("post_id",postIds);
+  if(!reviewCountError && reviewRows){
+    reviewRows.forEach(r=>{
+      reviewCounts[String(r.post_id)]=(reviewCounts[String(r.post_id)]||0)+1;
+    });
+  }
+
   list.innerHTML=data.map(p=>`
     <article class="post">
       <img src="${escapeAttr(p.image_url)}" alt="가족 사진" loading="lazy" onclick="viewPhoto('${escapeAttr(p.id)}',this.src)">
@@ -278,6 +291,7 @@ async function loadPhotos(){
         <div class="stats">
           <button class="like ${isLiked(p.id)?"active":""}" onclick="likePhoto('${escapeAttr(p.id)}',this)">👍 추천 <span>${Number(p.like_count||0)}</span></button>
           <span class="stat">👁 조회 ${Number(p.view_count||0)}</span>
+          <span class="stat">💬 댓글 <span class="comment-count-${escapeAttr(p.id)}">${Number(reviewCounts[String(p.id)]||0)}</span></span>
         </div>
         <button class="delete" onclick="deletePhoto('${escapeAttr(p.id)}','${escapeAttr(p.storage_path)}')">이 사진 삭제</button>
       </div>
@@ -378,6 +392,12 @@ async function submitReview(){
   localStorage.setItem("family_review_name",writer);
   document.getElementById("reviewContent").value="";
   await loadReviews(currentReviewPostId);
+
+  // 현재 사진 카드의 댓글 개수도 즉시 +1
+  const countEl=document.querySelector(".comment-count-"+CSS.escape(String(currentReviewPostId)));
+  if(countEl){
+    countEl.textContent=Number(countEl.textContent||0)+1;
+  }
 }
 
 function closeLightbox(e){
